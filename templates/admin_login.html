@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Login — SkillCheck</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+</head>
+<body>
+<div class="page-wrap">
+
+  <nav class="navbar">
+    <a href="/" class="nav-brand">
+      <span class="nav-brand-dot"></span>
+      SkillCheck
+    </a>
+    <div class="nav-links">
+      <a href="/">← Back to Quiz</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="login-wrap">
+
+      <div class="login-logo">
+        <div class="login-logo-icon">🔐</div>
+        <h1 class="login-title">Admin Access</h1>
+        <p class="login-sub">Enter your secret key to access the admin panel</p>
+      </div>
+
+      <div class="card">
+
+        {% if error %}
+        <div class="alert alert-error">⚠ {{ error }}</div>
+        {% endif %}
+
+        <form method="POST">
+          <div class="form-group">
+            <label>Admin Key</label>
+            <div class="key-input-wrap">
+              <input
+                type="password"
+                name="admin_key"
+                id="admin-key-input"
+                placeholder="Enter admin key…"
+                required
+                autocomplete="current-password"
+              />
+              <button type="button" class="eye-btn" onclick="toggleEye('admin-key-input', this)">👁</button>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-full btn-lg" style="margin-top:0.5rem">
+            Login →
+          </button>
+        </form>
+
+        <hr class="divider"/>
+
+
+
+      </div>
+
+      <p class="text-center mt-2" style="font-size:0.85rem; color:var(--text-muted)">
+        Not an admin? <a href="/" style="color:var(--accent2); text-decoration:none">Take a quiz instead →</a>
+      </p>
+
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

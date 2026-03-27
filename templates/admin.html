@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel — SkillCheck</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+</head>
+<body>
+<div class="page-wrap">
+
+  <nav class="navbar">
+    <a href="/" class="nav-brand">
+      <span class="nav-brand-dot"></span>
+      SkillCheck
+    </a>
+    <div class="nav-links">
+      <a href="/">🎯 <span>Quiz</span></a>
+      <a href="/leaderboard">🏆 <span>Leaderboard</span></a>
+      <a href="/analytics/export" target="_blank">📊 <span>Export CSV</span></a>
+      <a href="/admin/logout" style="color:var(--danger); border-color:rgba(248,113,113,0.2); background:rgba(248,113,113,0.06)">
+        Logout
+      </a>
+    </div>
+  </nav>
+
+  <div class="container-wide">
+
+    <h1 class="page-title">Admin Panel</h1>
+
+    <!-- ── Two column: Manual + AI ── -->
+    <div class="admin-grid mb-3">
+
+      <!-- Manual Add -->
+      <div class="card">
+        <h3 class="section-title">Add Question Manually</h3>
+        <form action="/admin/add" method="POST">
+
+          <div class="form-group">
+            <label>Topic</label>
+            <input type="text" name="topic" placeholder="e.g. Python, SQL, DSA" required/>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Difficulty</label>
+              <select name="difficulty" required>
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Question</label>
+            <textarea name="question" rows="3" placeholder="Write the question here…" required></textarea>
+          </div>
+
+          <div class="form-group"><label>Option 1</label><input type="text" name="option1" placeholder="Option 1" required/></div>
+          <div class="form-group"><label>Option 2</label><input type="text" name="option2" placeholder="Option 2" required/></div>
+          <div class="form-group"><label>Option 3</label><input type="text" name="option3" placeholder="Option 3" required/></div>
+          <div class="form-group"><label>Option 4</label><input type="text" name="option4" placeholder="Option 4" required/></div>
+
+          <div class="form-group">
+            <label>Correct Answer Key (option1 / option2 / option3 / option4)</label>
+            <input type="text" name="answer" placeholder="e.g. option1" required/>
+          </div>
+
+          <button type="submit" class="btn btn-success btn-full">✓ Save Question</button>
+        </form>
+      </div>
+
+      <!-- AI Generate -->
+      <div class="card">
+        <h3 class="section-title">Generate with AI ⚡</h3>
+        <form action="/admin/generate" method="POST">
+
+          <div class="form-group">
+            <label>Topic</label>
+            <input type="text" name="topic" placeholder="e.g. Machine Learning, NumPy" required/>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Difficulty</label>
+              <select name="difficulty" required>
+                <option value="easy">Easy</option>
+                <option value="medium" selected>Medium</option>
+                <option value="hard">Hard</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Number of questions</label>
+              <select name="num">
+                <option value="3">3 questions</option>
+                <option value="5" selected>5 questions</option>
+                <option value="10">10 questions</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Reference Context <span class="text-muted" style="font-weight:400; text-transform:none; letter-spacing:0;">(optional)</span></label>
+            <textarea name="context" rows="5" placeholder="Paste any notes, syllabus, or reference text — AI will generate questions from it. Leave blank and AI will generate its own context."></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-ai btn-full">⚡ Generate Questions</button>
+
+        </form>
+      </div>
+
+    </div>
+
+    <!-- ── AI Generated Preview ── -->
+    {% if generated %}
+    <div class="card" style="margin-top:0.5rem">
+      <h3 class="section-title">Review Generated Questions</h3>
+
+      <p class="text-muted mb-2" style="font-size:0.88rem">
+        Edit any question or option below, then approve to save all to the database.
+      </p>
+
+      {% if context %}
+      <details class="context-details mb-2">
+        <summary>Context used by AI</summary>
+        <p style="margin-top:0.5rem; color:var(--text-muted); font-size:0.85rem; line-height:1.6;">{{ context }}</p>
+      </details>
+      {% endif %}
+
+      <form action="/admin/approve" method="POST">
+        <input type="hidden" name="topic" value="{{ topic }}"/>
+        <input type="hidden" name="difficulty" value="{{ difficulty }}"/>
+        <input type="hidden" name="questions_json" id="questions-json"/>
+        <span id="gen-total" data-total="{{ generated | length }}" style="display:none"></span>
+
+        {% for q in generated %}
+        <div class="gen-q-card">
+
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.75rem;">
+            <span class="badge badge-purple">Q{{ loop.index }}</span>
+            <span class="badge badge-teal" style="font-size:0.72rem">{{ difficulty | capitalize }}</span>
+          </div>
+
+          <div class="form-group">
+            <label>Question</label>
+            <textarea name="q_{{ loop.index }}_question" rows="2">{{ q.question }}</textarea>
+          </div>
+
+          <div class="options-edit-grid">
+            <div class="form-group" style="margin-bottom:0">
+              <label>Option 1</label>
+              <input type="text" name="q_{{ loop.index }}_option1" value="{{ q.option1 }}"/>
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <label>Option 2</label>
+              <input type="text" name="q_{{ loop.index }}_option2" value="{{ q.option2 }}"/>
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <label>Option 3</label>
+              <input type="text" name="q_{{ loop.index }}_option3" value="{{ q.option3 }}"/>
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <label>Option 4</label>
+              <input type="text" name="q_{{ loop.index }}_option4" value="{{ q.option4 }}"/>
+            </div>
+          </div>
+
+          <div class="form-group mt-2" style="margin-bottom:0">
+            <label>Correct answer key</label>
+            <input type="text" name="q_{{ loop.index }}_answer" value="{{ q.answer }}"/>
+          </div>
+
+        </div>
+        {% endfor %}
+
+        <button
+          type="submit"
+          class="btn btn-primary btn-lg"
+          onclick="bundleQuestions(event)"
+          style="margin-top:0.5rem"
+        >
+          ✓ Approve &amp; Save All to Database
+        </button>
+
+      </form>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

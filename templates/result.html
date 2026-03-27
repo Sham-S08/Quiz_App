@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Your Result — SkillCheck</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+</head>
+<body>
+<div class="page-wrap">
+
+  <nav class="navbar">
+    <a href="/" class="nav-brand">
+      <span class="nav-brand-dot"></span>
+      SkillCheck
+    </a>
+    <div class="nav-links">
+      <a href="/leaderboard">🏆 <span>Leaderboard</span></a>
+      <a href="/admin" class="nav-admin">⚙️ <span>Admin</span></a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="result-wrap">
+
+      <!-- Score circle -->
+      <div style="position:relative; width:140px; height:140px; margin: 0 auto 1.5rem;">
+        <svg width="140" height="140" viewBox="0 0 140 140" style="position:absolute;top:0;left:0;transform:rotate(-90deg)">
+          <circle cx="70" cy="70" r="60" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8"/>
+          <circle cx="70" cy="70" r="60" fill="none"
+            stroke="url(#scoreGrad)" stroke-width="8"
+            stroke-linecap="round"
+            stroke-dasharray="{{ (pct / 100 * 376.99) | round(2) }} 376.99"
+            style="transition: stroke-dasharray 1.2s cubic-bezier(0.16,1,0.3,1)"/>
+          <defs>
+            <linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#7c6af7"/>
+              <stop offset="100%" stop-color="#06d6a0"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+          <div class="result-score-big">{{ score }}/{{ total }}</div>
+          <div class="result-score-label">{{ pct }}%</div>
+        </div>
+      </div>
+
+      <!-- Badge -->
+      <div class="result-badge-pill" style="background: {{ badge_color }}18; border-color: {{ badge_color }}; color: {{ badge_color }};">
+        {{ badge }}
+      </div>
+
+      <!-- Title -->
+      <h1 class="result-title">
+        {% if pct >= 80 %}Great job, {{ username }}!
+        {% elif pct >= 60 %}Good effort, {{ username }}!
+        {% else %}Keep practicing, {{ username }}!
+        {% endif %}
+      </h1>
+      <p class="result-sub">
+        You scored {{ score }} out of {{ total }} on <strong>{{ topic }}</strong> ({{ difficulty | capitalize }})
+      </p>
+
+      <!-- Stats grid -->
+      <div class="result-stats">
+        <div class="stat-card">
+          <div class="stat-val" style="color:#7c6af7">{{ score }}</div>
+          <div class="stat-key">Correct</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" style="color:#f87171">{{ total - score }}</div>
+          <div class="stat-key">Wrong</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" style="color:#06d6a0">{{ pct }}%</div>
+          <div class="stat-key">Score</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" style="color:#fbbf24">{{ time_taken }}s</div>
+          <div class="stat-key">Time</div>
+        </div>
+      </div>
+
+      <!-- Score bar -->
+      <div class="score-bar-wrap">
+        <div class="score-bar-fill" id="score-bar" data-pct="{{ pct }}" style="width:0%"></div>
+      </div>
+
+      <!-- Topic & difficulty badges -->
+      <div style="display:flex; gap:8px; justify-content:center; margin-bottom:2rem; flex-wrap:wrap;">
+        <span class="badge badge-purple">{{ topic }}</span>
+        <span class="badge badge-teal">{{ difficulty | capitalize }}</span>
+        {% if pct >= 80 %}
+        <span class="badge badge-teal">Proficient</span>
+        {% elif pct >= 60 %}
+        <span class="badge badge-amber">Intermediate</span>
+        {% else %}
+        <span class="badge badge-red">Beginner</span>
+        {% endif %}
+      </div>
+
+      <!-- Actions -->
+      <div class="result-actions">
+        <a href="/" class="btn btn-primary btn-lg">Try Another Quiz</a>
+        <a href="/leaderboard?topic={{ topic }}" class="btn btn-outline btn-lg">🏆 Leaderboard</a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

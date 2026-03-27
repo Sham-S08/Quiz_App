@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Leaderboard — SkillCheck</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+<div class="page-wrap">
+
+  <nav class="navbar">
+    <a href="/" class="nav-brand">
+      <span class="nav-brand-dot"></span>
+      SkillCheck
+    </a>
+    <div class="nav-links">
+      <a href="/">🎯 <span>Quiz</span></a>
+      <a href="/admin" class="nav-admin">⚙️ <span>Admin</span></a>
+    </div>
+  </nav>
+
+  <div class="container-wide">
+
+    <div class="card">
+      <div class="lb-header">
+        <div>
+          <h2 class="lb-title">
+            🏆 Leaderboard
+            {% if topic %}<span class="badge badge-purple" style="margin-left:10px;font-size:0.85rem">{{ topic }}</span>{% endif %}
+          </h2>
+          <p class="text-muted" style="font-size:0.85rem; margin-top:4px">
+            Ranked by highest score, then fastest time
+          </p>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <div class="live-badge">
+            <span class="live-dot-anim"></span>
+            Live
+          </div>
+          <a href="/leaderboard" class="btn btn-outline" style="padding:6px 14px; font-size:0.82rem">All topics</a>
+        </div>
+      </div>
+
+      <table class="lb-table">
+        <thead>
+          <tr>
+            <th style="text-align:center">#</th>
+            <th>Name</th>
+            <th>Topic</th>
+            <th>Score</th>
+            <th>Difficulty</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+        <tbody id="board-body">
+          {% for r in board %}
+          <tr>
+            <td class="rank-cell
+              {% if loop.index == 1 %}rank-1
+              {% elif loop.index == 2 %}rank-2
+              {% elif loop.index == 3 %}rank-3
+              {% else %}rank-other{% endif %}">
+              {% if loop.index == 1 %}🥇
+              {% elif loop.index == 2 %}🥈
+              {% elif loop.index == 3 %}🥉
+              {% else %}{{ loop.index }}{% endif %}
+            </td>
+            <td class="username-cell">{{ r.username }}</td>
+            <td><span class="badge badge-purple" style="font-size:0.75rem">{{ r.topic }}</span></td>
+            <td class="score-cell">{{ r.score }}/{{ r.total }}</td>
+            <td>
+              {% if r.difficulty == 'easy' %}<span class="badge badge-teal" style="font-size:0.72rem">Easy</span>
+              {% elif r.difficulty == 'medium' %}<span class="badge badge-amber" style="font-size:0.72rem">Medium</span>
+              {% else %}<span class="badge badge-red" style="font-size:0.72rem">Hard</span>{% endif %}
+            </td>
+            <td class="time-cell">{{ r.time_taken }}s</td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="6" class="lb-empty">
+              No results yet — be the first to take a quiz!
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+    </div>
+
+    <div style="text-align:center; margin-top:1.5rem;">
+      <a href="/" class="btn btn-primary">Take a Quiz →</a>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const socket = io();
+
+  socket.on('score_update', (data) => {
+    const tbody = document.getElementById('board-body');
+    const empty = tbody.querySelector('.lb-empty');
+    if (empty) empty.closest('tr').remove();
+
+    const tr = document.createElement('tr');
+    tr.classList.add('new-row');
+    tr.innerHTML = `
+      <td class="rank-cell rank-other">—</td>
+      <td class="username-cell">${data.username}</td>
+      <td><span class="badge badge-purple" style="font-size:.75rem">${data.topic}</span></td>
+      <td class="score-cell">${data.score}/${data.total}</td>
+      <td><span class="badge badge-teal" style="font-size:.72rem">—</span></td>
+      <td class="time-cell">just now</td>
+    `;
+    tbody.insertBefore(tr, tbody.firstChild);
+
+    setTimeout(() => tr.classList.remove('new-row'), 3000);
+  });
+</script>
+</body>
+</html>
