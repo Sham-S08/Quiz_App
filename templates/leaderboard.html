@@ -12,12 +12,20 @@
 
   <nav class="navbar">
     <a href="/" class="nav-brand">
-      <span class="nav-brand-dot"></span>
+      <span class="nav-brand-icon">
+        <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </span>
       SkillCheck
     </a>
     <div class="nav-links">
-      <a href="/">🎯 <span>Quiz</span></a>
-      <a href="/admin" class="nav-admin">⚙️ <span>Admin</span></a>
+      <a href="/">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+        <span>Take Quiz</span>
+      </a>
+      <a href="/admin" class="nav-admin">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
+        <span>Admin</span>
+      </a>
     </div>
   </nav>
 
@@ -27,13 +35,13 @@
       <div class="lb-header">
         <div>
           <h2 class="lb-title">
-            🏆 Leaderboard
-            {% if topic %}<span class="badge badge-purple" style="margin-left:10px;font-size:0.85rem">{{ topic }}</span>{% endif %}
+            <svg viewBox="0 0 24 24"><path d="M8 21H4a2 2 0 0 1-2-2v-5m6 7h8m-8 0V3m8 18h4a2 2 0 0 0 2-2v-5m-6 7V7m0 0H8m8 0l-4-4"/></svg>
+            Leaderboard
+            {% if topic %}<span class="badge badge-purple" style="margin-left:4px; font-size:0.82rem">{{ topic }}</span>{% endif %}
           </h2>
-          <p class="text-muted" style="font-size:0.85rem; margin-top:4px">
-            Ranked by highest score, then fastest time
-          </p>
+          <p class="lb-sub">Ranked by highest score, then fastest time</p>
         </div>
+
         <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
           <div class="live-badge">
             <span class="live-dot-anim"></span>
@@ -46,7 +54,7 @@
       <table class="lb-table">
         <thead>
           <tr>
-            <th style="text-align:center">#</th>
+            <th style="text-align:center">Rank</th>
             <th>Name</th>
             <th>Topic</th>
             <th>Score</th>
@@ -62,13 +70,13 @@
               {% elif loop.index == 2 %}rank-2
               {% elif loop.index == 3 %}rank-3
               {% else %}rank-other{% endif %}">
-              {% if loop.index == 1 %}🥇
-              {% elif loop.index == 2 %}🥈
-              {% elif loop.index == 3 %}🥉
+              {% if loop.index == 1 %}1st
+              {% elif loop.index == 2 %}2nd
+              {% elif loop.index == 3 %}3rd
               {% else %}{{ loop.index }}{% endif %}
             </td>
             <td class="username-cell">{{ r.username }}</td>
-            <td><span class="badge badge-purple" style="font-size:0.75rem">{{ r.topic }}</span></td>
+            <td><span class="badge badge-purple" style="font-size:0.73rem">{{ r.topic }}</span></td>
             <td class="score-cell">{{ r.score }}/{{ r.total }}</td>
             <td>
               {% if r.difficulty == 'easy' %}<span class="badge badge-teal" style="font-size:0.72rem">Easy</span>
@@ -79,45 +87,43 @@
           </tr>
           {% else %}
           <tr>
-            <td colspan="6" class="lb-empty">
-              No results yet — be the first to take a quiz!
-            </td>
+            <td colspan="6" class="lb-empty">No results yet — be the first to take a quiz!</td>
           </tr>
           {% endfor %}
         </tbody>
       </table>
-
     </div>
 
     <div style="text-align:center; margin-top:1.5rem;">
-      <a href="/" class="btn btn-primary">Take a Quiz →</a>
+      <a href="/" class="btn btn-primary btn-lg">
+        <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Take a Quiz
+      </a>
     </div>
 
   </div>
 </div>
 
 <script>
-  const socket = io();
+const socket = io();
+socket.on('score_update', (data) => {
+  const tbody = document.getElementById('board-body');
+  const empty = tbody.querySelector('.lb-empty');
+  if (empty) empty.closest('tr').remove();
 
-  socket.on('score_update', (data) => {
-    const tbody = document.getElementById('board-body');
-    const empty = tbody.querySelector('.lb-empty');
-    if (empty) empty.closest('tr').remove();
-
-    const tr = document.createElement('tr');
-    tr.classList.add('new-row');
-    tr.innerHTML = `
-      <td class="rank-cell rank-other">—</td>
-      <td class="username-cell">${data.username}</td>
-      <td><span class="badge badge-purple" style="font-size:.75rem">${data.topic}</span></td>
-      <td class="score-cell">${data.score}/${data.total}</td>
-      <td><span class="badge badge-teal" style="font-size:.72rem">—</span></td>
-      <td class="time-cell">just now</td>
-    `;
-    tbody.insertBefore(tr, tbody.firstChild);
-
-    setTimeout(() => tr.classList.remove('new-row'), 3000);
-  });
+  const tr = document.createElement('tr');
+  tr.classList.add('new-row');
+  tr.innerHTML = `
+    <td class="rank-cell rank-other">New</td>
+    <td class="username-cell">${data.username}</td>
+    <td><span class="badge badge-purple" style="font-size:.73rem">${data.topic}</span></td>
+    <td class="score-cell">${data.score}/${data.total}</td>
+    <td><span class="badge badge-gray" style="font-size:.72rem">—</span></td>
+    <td class="time-cell">just now</td>
+  `;
+  tbody.insertBefore(tr, tbody.firstChild);
+  setTimeout(() => tr.classList.remove('new-row'), 3000);
+});
 </script>
 </body>
 </html>

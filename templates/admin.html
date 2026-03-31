@@ -11,14 +11,26 @@
 
   <nav class="navbar">
     <a href="/" class="nav-brand">
-      <span class="nav-brand-dot"></span>
+      <span class="nav-brand-icon">
+        <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </span>
       SkillCheck
     </a>
     <div class="nav-links">
-      <a href="/">🎯 <span>Quiz</span></a>
-      <a href="/leaderboard">🏆 <span>Leaderboard</span></a>
-      <a href="/analytics/export" target="_blank">📊 <span>Export CSV</span></a>
-      <a href="/admin/logout" style="color:var(--danger); border-color:rgba(248,113,113,0.2); background:rgba(248,113,113,0.06)">
+      <a href="/">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+        <span>Quiz</span>
+      </a>
+      <a href="/leaderboard">
+        <svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+        <span>Leaderboard</span>
+      </a>
+      <a href="/analytics/export" target="_blank">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span>Export CSV</span>
+      </a>
+      <a href="/admin/logout" class="nav-logout">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         Logout
       </a>
     </div>
@@ -27,13 +39,17 @@
   <div class="container-wide">
 
     <h1 class="page-title">Admin Panel</h1>
+    <p class="page-subtitle">Manage questions, generate with AI, and export analytics data.</p>
 
-    <!-- ── Two column: Manual + AI ── -->
+    <!-- ── Two columns ── -->
     <div class="admin-grid mb-3">
 
       <!-- Manual Add -->
       <div class="card">
-        <h3 class="section-title">Add Question Manually</h3>
+        <h3 class="section-title">
+          <span class="section-title-bar"></span>
+          Add Question Manually
+        </h3>
         <form action="/admin/add" method="POST">
 
           <div class="form-group">
@@ -64,16 +80,22 @@
 
           <div class="form-group">
             <label>Correct Answer Key (option1 / option2 / option3 / option4)</label>
-            <input type="text" name="answer" placeholder="e.g. option1" required/>
+            <input type="text" name="answer" placeholder="e.g. option2" required/>
           </div>
 
-          <button type="submit" class="btn btn-success btn-full">✓ Save Question</button>
+          <button type="submit" class="btn btn-success btn-full">
+            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            Save Question
+          </button>
         </form>
       </div>
 
       <!-- AI Generate -->
       <div class="card">
-        <h3 class="section-title">Generate with AI ⚡</h3>
+        <h3 class="section-title">
+          <span class="section-title-bar"></span>
+          Generate with AI
+        </h3>
         <form action="/admin/generate" method="POST">
 
           <div class="form-group">
@@ -101,45 +123,52 @@
           </div>
 
           <div class="form-group">
-            <label>Reference Context <span class="text-muted" style="font-weight:400; text-transform:none; letter-spacing:0;">(optional)</span></label>
-            <textarea name="context" rows="5" placeholder="Paste any notes, syllabus, or reference text — AI will generate questions from it. Leave blank and AI will generate its own context."></textarea>
+            <label>Reference Context <span style="text-transform:none;letter-spacing:0;font-weight:500;color:var(--text-3)">(optional)</span></label>
+            <textarea name="context" rows="6" placeholder="Paste notes, syllabus, or reference text. Leave blank and AI will generate its own context automatically."></textarea>
           </div>
 
-          <button type="submit" class="btn btn-ai btn-full">⚡ Generate Questions</button>
-
+          <button type="submit" class="btn btn-ai btn-full">
+            <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Generate Questions
+          </button>
         </form>
       </div>
-
     </div>
 
-    <!-- ── AI Generated Preview ── -->
+    <!-- ── AI Preview ── -->
     {% if generated %}
-    <div class="card" style="margin-top:0.5rem">
-      <h3 class="section-title">Review Generated Questions</h3>
-
+    <div class="card mt-2">
+      <h3 class="section-title">
+        <span class="section-title-bar"></span>
+        Review Generated Questions
+      </h3>
       <p class="text-muted mb-2" style="font-size:0.88rem">
-        Edit any question or option below, then approve to save all to the database.
+        Edit any field below if needed, then approve to save all to the database.
       </p>
 
       {% if context %}
       <details class="context-details mb-2">
-        <summary>Context used by AI</summary>
-        <p style="margin-top:0.5rem; color:var(--text-muted); font-size:0.85rem; line-height:1.6;">{{ context }}</p>
+        <summary>
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Context used by AI
+        </summary>
+        <p>{{ context }}</p>
       </details>
       {% endif %}
 
       <form action="/admin/approve" method="POST">
-        <input type="hidden" name="topic" value="{{ topic }}"/>
+        <input type="hidden" name="topic"      value="{{ topic }}"/>
         <input type="hidden" name="difficulty" value="{{ difficulty }}"/>
         <input type="hidden" name="questions_json" id="questions-json"/>
-        <span id="gen-total" data-total="{{ generated | length }}" style="display:none"></span>
+        <span id="gen-total" data-total="{{ generated|length }}" style="display:none"></span>
 
         {% for q in generated %}
         <div class="gen-q-card">
-
           <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.75rem;">
             <span class="badge badge-purple">Q{{ loop.index }}</span>
-            <span class="badge badge-teal" style="font-size:0.72rem">{{ difficulty | capitalize }}</span>
+            {% if difficulty == 'easy' %}<span class="badge badge-teal" style="font-size:0.72rem">Easy</span>
+            {% elif difficulty == 'medium' %}<span class="badge badge-amber" style="font-size:0.72rem">Medium</span>
+            {% else %}<span class="badge badge-red" style="font-size:0.72rem">Hard</span>{% endif %}
           </div>
 
           <div class="form-group">
@@ -170,7 +199,6 @@
             <label>Correct answer key</label>
             <input type="text" name="q_{{ loop.index }}_answer" value="{{ q.answer }}"/>
           </div>
-
         </div>
         {% endfor %}
 
@@ -178,9 +206,10 @@
           type="submit"
           class="btn btn-primary btn-lg"
           onclick="bundleQuestions(event)"
-          style="margin-top:0.5rem"
+          style="margin-top:0.25rem"
         >
-          ✓ Approve &amp; Save All to Database
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          Approve &amp; Save All to Database
         </button>
 
       </form>

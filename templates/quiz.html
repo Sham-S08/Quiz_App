@@ -11,12 +11,20 @@
 
   <nav class="navbar">
     <a href="/" class="nav-brand">
-      <span class="nav-brand-dot"></span>
+      <span class="nav-brand-icon">
+        <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </span>
       SkillCheck
     </a>
     <div class="nav-links">
-      <a href="/leaderboard">🏆 <span>Leaderboard</span></a>
-      <a href="/admin" class="nav-admin">⚙️ <span>Admin</span></a>
+      <a href="/leaderboard">
+        <svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+        <span>Leaderboard</span>
+      </a>
+      <a href="/admin" class="nav-admin">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
+        <span>Admin</span>
+      </a>
     </div>
   </nav>
 
@@ -26,12 +34,18 @@
     <!-- ── START SCREEN ── -->
     <div class="hero-card card">
 
-      <div class="hero-icon">⚡</div>
-      <h1 class="hero-title">Test Your Skills</h1>
-      <p class="hero-sub">Pick a topic, set your difficulty, and see where you stand — results in under 60 seconds.</p>
+      <div class="hero-icon">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+      </div>
+
+      <h1 class="hero-title">Test Your <span>Skills</span></h1>
+      <p class="hero-sub">Pick a topic, set your difficulty, and find out where you stand —</p>
 
       {% if error %}
-      <div class="alert alert-error">⚠ {{ error }}</div>
+      <div class="alert alert-error">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        {{ error }}
+      </div>
       {% endif %}
 
       <form action="/start" method="POST">
@@ -43,10 +57,9 @@
 
         <div class="form-group">
           <label>Topic</label>
-          <input type="text" name="topic" placeholder="e.g. Python, SQL, Machine Learning, DSA…" required autocomplete="off"/>
+          <input type="text" name="topic" placeholder="e.g. Python, SQL, Machine Learning, DSA" required autocomplete="off"/>
         </div>
 
-        <div class="form-row">
           <div class="form-group">
             <label>Difficulty</label>
             <select name="difficulty" required>
@@ -57,73 +70,57 @@
             </select>
           </div>
 
-          <div class="form-group">
-            <label>Timer per question</label>
-            <select name="timer">
-              <option value="0">No timer</option>
-              <option value="15">15 seconds</option>
-              <option value="30">30 seconds</option>
-              <option value="45">45 seconds</option>
-              <option value="60">60 seconds</option>
-            </select>
-          </div>
-        </div>
-
         <button type="submit" class="btn btn-primary btn-full btn-lg" style="margin-top:0.5rem">
-          Start Quiz →
+          <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Start Quiz
         </button>
 
       </form>
 
       <hr class="divider"/>
       <p class="text-center text-muted" style="font-size:0.82rem">
-        Questions are loaded from the database. Ask admin to generate topics if empty.
+        No questions for a topic? Ask your admin to generate them first.
       </p>
 
     </div>
 
     {% else %}
     <!-- ── QUIZ SCREEN ── -->
-
-    <!-- Timer value passthrough -->
     <span id="timer-value" data-timer="{{ timer }}" style="display:none"></span>
 
-    <!-- Top bar -->
     <div class="quiz-topbar">
       <div class="quiz-meta">
         <span class="badge badge-purple">{{ topic }}</span>
-        <span class="badge badge-teal">{{ difficulty | capitalize }}</span>
-        <span style="font-size:0.85rem; color:var(--text-muted)">👤 {{ username }}</span>
+        <span class="badge badge-blue">{{ difficulty | capitalize }}</span>
+        <span style="font-size:0.85rem; color:var(--text-3); font-weight:600; display:flex; align-items:center; gap:5px;">
+          <svg style="width:13px;height:13px;fill:none;stroke:var(--text-4);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
+          {{ username }}
+        </span>
       </div>
 
       {% if timer > 0 %}
       <div class="timer-pill" id="timer-pill">
-        <span class="timer-icon">⏱</span>
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
         <span id="timer-display">{{ timer }}s</span>
       </div>
       {% endif %}
     </div>
 
-    <!-- Progress bar -->
     <div class="progress-wrap">
       <div class="progress-label">
         <span>Progress</span>
-        <span id="progress-label">0 / {{ questions|length }} questions</span>
+        <span id="progress-label">0 / {{ questions|length }} answered</span>
       </div>
       <div class="progress-bar-bg">
         <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
       </div>
     </div>
-    <span id="q-total" data-total="{{ questions|length }}" data-current="0" style="display:none"></span>
 
-    <!-- Questions -->
     <form action="/submit" method="POST" id="quiz-form">
-
       {% for q in questions %}
-      <div class="question-card" style="animation-delay: {{ loop.index0 * 0.05 }}s">
+      <div class="question-card" style="animation-delay:{{ loop.index0 * 0.05 }}s">
         <div class="q-number">Question {{ loop.index }} of {{ questions|length }}</div>
         <div class="q-text">{{ q.question }}</div>
-
         <div class="options-grid">
           {% for opt in q.options %}
           <label class="option-label">
@@ -138,10 +135,10 @@
 
       <div class="submit-row">
         <button type="submit" class="btn btn-primary btn-lg">
-          Submit Quiz ✓
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          Submit Quiz
         </button>
       </div>
-
     </form>
     {% endif %}
 
@@ -150,27 +147,22 @@
 
 <script src="{{ url_for('static', filename='script.js') }}"></script>
 <script>
-  // Live progress tracking as user answers
-  (function () {
-    const totalEl   = document.getElementById('q-total');
-    const fillEl    = document.getElementById('progress-fill');
-    const labelEl   = document.getElementById('progress-label');
-    const total     = parseInt(totalEl?.dataset.total || '0');
-    if (!total) return;
+(function () {
+  const total = {{ questions|length if questions else 0 }};
+  if (!total) return;
+  const fill  = document.getElementById('progress-fill');
+  const label = document.getElementById('progress-label');
 
-    function updateProgress() {
-      const answered = new Set(
-        [...document.querySelectorAll('input[type=radio]:checked')].map(r => r.name)
-      ).size;
-      const pct = Math.round((answered / total) * 100);
-      if (fillEl) fillEl.style.width = pct + '%';
-      if (labelEl) labelEl.textContent = answered + ' / ' + total + ' answered';
-    }
+  function update() {
+    const answered = new Set(
+      [...document.querySelectorAll('input[type=radio]:checked')].map(r => r.name)
+    ).size;
+    if (fill)  fill.style.width = Math.round((answered / total) * 100) + '%';
+    if (label) label.textContent = answered + ' / ' + total + ' answered';
+  }
 
-    document.querySelectorAll('input[type=radio]').forEach(r => {
-      r.addEventListener('change', updateProgress);
-    });
-  })();
+  document.querySelectorAll('input[type=radio]').forEach(r => r.addEventListener('change', update));
+})();
 </script>
 </body>
 </html>
