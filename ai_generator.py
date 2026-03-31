@@ -69,9 +69,16 @@ Rules:
 - Only one option must be correct
 - The answer field must match the key of the correct option exactly (option1, option2, option3, or option4)
 - Questions should be clear and unambiguous
-- For {difficulty} difficulty: {'simple and straightforward' if difficulty == 'easy' else 'moderately challenging with some depth' if difficulty == 'medium' else 'advanced and requires deep knowledge'}
+- Focus on conceptual understanding, practical scenarios, and logical reasoning
+- Avoid purely historical or trivial fact-based questions unless necessary
+- Prefer application-based questions that test skills rather than memorization
+- Include real-world or problem-solving situations when possible
+- Avoid repeated question patterns and ensure variety
+- Keep questions strictly relevant to the topic provided
+- For {difficulty} difficulty: {'simple and straightforward conceptual checks' if difficulty == 'easy' else 'moderately challenging with applied logic and understanding' if difficulty == 'medium' else 'advanced, analytical, and requiring deep conceptual knowledge'}
 
 Return the JSON object with {num} questions."""
+
 
     try:
         # Use system instruction via GenerativeModel with system_instruction
